@@ -3,6 +3,7 @@ package com.miniproject.programming.dmaker.service;
 import com.miniproject.programming.dmaker.dto.CreateDeveloper;
 import com.miniproject.programming.dmaker.dto.DeveloperDetailDto;
 import com.miniproject.programming.dmaker.dto.DeveloperDto;
+import com.miniproject.programming.dmaker.dto.EditDeveloper;
 import com.miniproject.programming.dmaker.entity.Developer;
 import com.miniproject.programming.dmaker.exception.DMakerException;
 import com.miniproject.programming.dmaker.repository.DeveloperRepository;
@@ -61,9 +62,19 @@ public class DMakerService {
     }
 
     private void validateCreateDeveloperRequest(CreateDeveloper.Request request) {
-        DeveloperLevel developerLevel = request.getDeveloperLevel();
-        Integer experienceYears = request.getExperienceYears();
+        validateDeveloperLevel(request.getDeveloperLevel(), request.getExperienceYears());
 
+//        Optional<Developer> developer =developerRepository.findByMemberId(request.getMemberId());
+//        if(developer.isPresent()) throw new DMakerException(DUPLICATED_MEMBER_ID);
+        //아래의 코드로 한번에 해결할 수 있다.
+        developerRepository.findByMemberId(request.getMemberId()).ifPresent(
+                developer -> {
+                    throw new DMakerException(DUPLICATED_MEMBER_ID);
+                }
+        );
+    }
+
+    private static void validateDeveloperLevel(DeveloperLevel developerLevel, Integer experienceYears) {
         if (developerLevel == DeveloperLevel.SENIOR && experienceYears < 10) {
             //특정 비즈니스에서의 어떤 예외적인 상황이 발생했을 때, 이런 일반적인 Exception(RuntimeException) 말고 커스텀 익셉션을 사용해야 정확히 어떤 에러가 났는지
             //확인할 수 있고 원하는 기능을 넣을 수 있기 때문에
@@ -79,15 +90,6 @@ public class DMakerService {
         if (developerLevel == DeveloperLevel.JUNIOR && experienceYears >= 4) {
             throw new DMakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
         }
-
-//        Optional<Developer> developer =developerRepository.findByMemberId(request.getMemberId());
-//        if(developer.isPresent()) throw new DMakerException(DUPLICATED_MEMBER_ID);
-        //아래의 코드로 한번에 해결할 수 있다.
-        developerRepository.findByMemberId(request.getMemberId()).ifPresent(
-                developer -> {
-                    throw new DMakerException(DUPLICATED_MEMBER_ID);
-                }
-        );
     }
 
     public List<DeveloperDto> getAllDevelopers() {
@@ -99,5 +101,23 @@ public class DMakerService {
     public DeveloperDetailDto getDeveloperDetail(String memberId) {
         return developerRepository.findByMemberId(memberId).map(DeveloperDetailDto::fromEntity)
                 .orElseThrow(() -> new DMakerException(NO_DEVELOPER));
+    }
+
+    @Transactional
+    public DeveloperDetailDto editDeveloper(String memberId, EditDeveloper.Request request) {
+        //validation 확인
+        validateEditDeveloperRequest(request);
+
+        Developer developer = developerRepository.findByMemberId(memberId).orElseThrow(() -> new DMakerException(DUPLICATED_MEMBER_ID));
+
+        developer.setDeveloperLevel(request.getDeveloperLevel());
+        developer.setDeveloperSkillType(request.getDeveloperSkillType());
+        developer.setExperienceYears(request.getExperienceYears());
+
+        return DeveloperDetailDto.fromEntity(developer);
+    }
+
+    private void validateEditDeveloperRequest(EditDeveloper.Request request) {
+        validateDeveloperLevel(request.getDeveloperLevel(), request.getExperienceYears());
     }
 }

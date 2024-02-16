@@ -4,6 +4,7 @@ package com.miniproject.programming.dmaker.controller;
 import com.miniproject.programming.dmaker.dto.CreateDeveloper;
 import com.miniproject.programming.dmaker.dto.DeveloperDetailDto;
 import com.miniproject.programming.dmaker.dto.DeveloperDto;
+import com.miniproject.programming.dmaker.dto.EditDeveloper;
 import com.miniproject.programming.dmaker.service.DMakerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,19 @@ public class DMakerController {
     ) {
         log.info("request: {}", request);
         return dMakerService.createDeveloper(request);
+    }
+
+    //수정
+    // put은 모든 정보를 다 수정하겠다는 의미이며
+    // 패치는 우리가 해당 리소스 중에 특정 데이터만 수정을 해주겠다는 의미이다.
+    @PutMapping("/developer/{memberId}")
+    public DeveloperDetailDto editDeveloper(
+        @PathVariable String memberId,
+        @Valid @RequestBody EditDeveloper.Request request
+    ){
+        log.info("");
+
+        return dMakerService.editDeveloper(memberId, request);
     }
 
 }
