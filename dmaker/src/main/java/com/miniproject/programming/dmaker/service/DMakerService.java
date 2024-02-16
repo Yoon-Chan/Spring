@@ -1,18 +1,20 @@
 package com.miniproject.programming.dmaker.service;
 
 import com.miniproject.programming.dmaker.dto.CreateDeveloper;
+import com.miniproject.programming.dmaker.dto.DeveloperDetailDto;
+import com.miniproject.programming.dmaker.dto.DeveloperDto;
 import com.miniproject.programming.dmaker.entity.Developer;
 import com.miniproject.programming.dmaker.exception.DMakerException;
 import com.miniproject.programming.dmaker.repository.DeveloperRepository;
 import com.miniproject.programming.dmaker.type.DeveloperLevel;
-import com.miniproject.programming.dmaker.type.DeveloperSkillType;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.miniproject.programming.dmaker.exception.DMakerErrorCode.DUPLICATED_MEMBER_ID;
-import static com.miniproject.programming.dmaker.exception.DMakerErrorCode.LEVEL_EXPERIENCE_YEARS_NOT_MATCHED;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.miniproject.programming.dmaker.exception.DMakerErrorCode.*;
 
 //비즈니스 로직을 담당해주는 부분이다.
 //서비스나 컨트롤러는 RequiredArgsConstructor를 사용하면 편하다.
@@ -32,33 +34,30 @@ public class DMakerService {
     //@Inject
     private final DeveloperRepository developerRepository;
 
-    //db를 추상화한 개념인 EntityManager
-    private final EntityManager em;
-
-
     //2번 방식: 생성자에 주입을 받는 방식
     //public DMakerService(DeveloperRepository developerRepository) {
 //        this.developerRepository = developerRepository
 //    }
 
     @Transactional
-    public void createDeveloper(CreateDeveloper.Request request) {
+    public CreateDeveloper.Response createDeveloper(CreateDeveloper.Request request) {
 
         //비즈니스 검증
         validateCreateDeveloperRequest(request);
         //business logic start
         Developer developer = Developer.builder()
-                .developerLevel(DeveloperLevel.JUNIOR)
-                .developerSkillType(DeveloperSkillType.FRONT_END)
-                .experienceYears(2)
-                .name("Olaf")
-                .age(5)
+                .developerLevel(request.getDeveloperLevel())
+                .developerSkillType(request.getDeveloperSkillType())
+                .experienceYears(request.getExperienceYears())
+                .name(request.getName())
+                .memberId(request.getMemberId())
+                .age(request.getAge())
                 .build();
 
         //여기서 여러 db 관련 작업을 진행한다.
         developerRepository.save(developer);
         //business logic end
-
+        return CreateDeveloper.Response.fromEntity(developer);
     }
 
     private void validateCreateDeveloperRequest(CreateDeveloper.Request request) {
@@ -89,5 +88,16 @@ public class DMakerService {
                     throw new DMakerException(DUPLICATED_MEMBER_ID);
                 }
         );
+    }
+
+    public List<DeveloperDto> getAllDevelopers() {
+        return developerRepository.findAll().stream().map(DeveloperDto::fromEntity
+        ).collect(Collectors.toList());
+
+    }
+
+    public DeveloperDetailDto getDeveloperDetail(String memberId) {
+        return developerRepository.findByMemberId(memberId).map(DeveloperDetailDto::fromEntity)
+                .orElseThrow(() -> new DMakerException(NO_DEVELOPER));
     }
 }

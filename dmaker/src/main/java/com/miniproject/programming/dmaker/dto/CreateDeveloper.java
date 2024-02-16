@@ -1,6 +1,7 @@
 package com.miniproject.programming.dmaker.dto;
 
 
+import com.miniproject.programming.dmaker.entity.Developer;
 import com.miniproject.programming.dmaker.type.DeveloperLevel;
 import com.miniproject.programming.dmaker.type.DeveloperSkillType;
 import jakarta.validation.constraints.Max;
@@ -51,5 +52,15 @@ public class CreateDeveloper {
         private Integer experienceYears;
 
         private String memberId;
+
+        //entity 값을 Response 객체로 반환
+        public static Response fromEntity(Developer developer) {
+            return Response.builder()
+                    .developerLevel(developer.getDeveloperLevel())
+                    .developerSkillType(developer.getDeveloperSkillType())
+                    .memberId(developer.getMemberId())
+                    .experienceYears(developer.getExperienceYears())
+                    .build();
+        }
     }
 }
