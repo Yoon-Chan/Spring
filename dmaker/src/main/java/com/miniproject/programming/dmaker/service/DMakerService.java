@@ -5,8 +5,10 @@ import com.miniproject.programming.dmaker.dto.DeveloperDetailDto;
 import com.miniproject.programming.dmaker.dto.DeveloperDto;
 import com.miniproject.programming.dmaker.dto.EditDeveloper;
 import com.miniproject.programming.dmaker.entity.Developer;
+import com.miniproject.programming.dmaker.entity.RetiredDeveloper;
 import com.miniproject.programming.dmaker.exception.DMakerException;
 import com.miniproject.programming.dmaker.repository.DeveloperRepository;
+import com.miniproject.programming.dmaker.repository.RetiredDeveloperRepository;
 import com.miniproject.programming.dmaker.type.DeveloperLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.miniproject.programming.dmaker.code.StatusCode.EMPLOYED;
+import static com.miniproject.programming.dmaker.code.StatusCode.RETIRED;
 import static com.miniproject.programming.dmaker.exception.DMakerErrorCode.*;
 
 //비즈니스 로직을 담당해주는 부분이다.
@@ -35,6 +39,8 @@ public class DMakerService {
     //@Inject
     private final DeveloperRepository developerRepository;
 
+    private final RetiredDeveloperRepository retiredDeveloperRepository;
+
     //2번 방식: 생성자에 주입을 받는 방식
     //public DMakerService(DeveloperRepository developerRepository) {
 //        this.developerRepository = developerRepository
@@ -53,6 +59,7 @@ public class DMakerService {
                 .name(request.getName())
                 .memberId(request.getMemberId())
                 .age(request.getAge())
+                .statusCode(EMPLOYED)
                 .build();
 
         //여기서 여러 db 관련 작업을 진행한다.
@@ -92,8 +99,8 @@ public class DMakerService {
         }
     }
 
-    public List<DeveloperDto> getAllDevelopers() {
-        return developerRepository.findAll().stream().map(DeveloperDto::fromEntity
+    public List<DeveloperDto> getAllEmployedDevelopers() {
+        return developerRepository.findDevelopersByStatusCodeEquals(EMPLOYED).stream().map(DeveloperDto::fromEntity
         ).collect(Collectors.toList());
 
     }
@@ -119,5 +126,22 @@ public class DMakerService {
 
     private void validateEditDeveloperRequest(EditDeveloper.Request request) {
         validateDeveloperLevel(request.getDeveloperLevel(), request.getExperienceYears());
+    }
+
+    @Transactional
+    public DeveloperDetailDto deleteDeveloper(String memberId) {
+        //EMPLOYED -> RETIRED
+        Developer developer = developerRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new DMakerException(NO_DEVELOPER));
+        developer.setStatusCode(RETIRED);
+        //save into RetiredDeveloper 테이블에 퇴직한 사람의 정보를 저장하도록 한다.
+        RetiredDeveloper retiredDeveloper = RetiredDeveloper.builder()
+                .memberId(memberId)
+                .name(developer.getName())
+                .build();
+
+        retiredDeveloperRepository.save(retiredDeveloper);
+
+        return DeveloperDetailDto.fromEntity(developer);
     }
 }

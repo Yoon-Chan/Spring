@@ -1,5 +1,6 @@
 package com.miniproject.programming.dmaker.dto;
 
+import com.miniproject.programming.dmaker.code.StatusCode;
 import com.miniproject.programming.dmaker.entity.Developer;
 import com.miniproject.programming.dmaker.type.DeveloperLevel;
 import com.miniproject.programming.dmaker.type.DeveloperSkillType;
@@ -24,6 +25,7 @@ public class DeveloperDetailDto {
     //이름과 나이
     private String name;
     private Integer age;
+    private StatusCode statusCode;
 
     public static DeveloperDetailDto fromEntity(Developer developer) {
         return DeveloperDetailDto.builder()
@@ -33,6 +35,7 @@ public class DeveloperDetailDto {
                 .age(developer.getAge())
                 .experienceYears(developer.getExperienceYears())
                 .name(developer.getName())
+                .statusCode(developer.getStatusCode())
                 .build();
     }
 }
