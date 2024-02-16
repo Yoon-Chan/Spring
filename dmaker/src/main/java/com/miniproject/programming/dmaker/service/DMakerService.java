@@ -1,9 +1,12 @@
 package com.miniproject.programming.dmaker.service;
 
+import com.miniproject.programming.dmaker.dto.CreateDeveloper;
 import com.miniproject.programming.dmaker.entity.Developer;
 import com.miniproject.programming.dmaker.repository.DeveloperRepository;
 import com.miniproject.programming.dmaker.type.DeveloperLevel;
 import com.miniproject.programming.dmaker.type.DeveloperSkillType;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,21 +29,29 @@ public class DMakerService {
     //@Inject
     private final DeveloperRepository developerRepository;
 
+    //db를 추상화한 개념인 EntityManager
+    private final EntityManager em;
+
+
     //2번 방식: 생성자에 주입을 받는 방식
     //public DMakerService(DeveloperRepository developerRepository) {
 //        this.developerRepository = developerRepository
 //    }
 
     @Transactional
-    public void createDeveloper() {
-        Developer developer = Developer.builder()
-                .developerLevel(DeveloperLevel.JUNIOR)
-                .developerSkillType(DeveloperSkillType.FRONT_END)
-                .experienceYears(2)
-                .name("Olaf")
-                .age(5)
-                .build();
+    public void createDeveloper(CreateDeveloper.Request request) {
+            //business logic start
+            Developer developer = Developer.builder()
+                    .developerLevel(DeveloperLevel.JUNIOR)
+                    .developerSkillType(DeveloperSkillType.FRONT_END)
+                    .experienceYears(2)
+                    .name("Olaf")
+                    .age(5)
+                    .build();
 
-        developerRepository.save(developer);
+            //여기서 여러 db 관련 작업을 진행한다.
+            developerRepository.save(developer);
+            //business logic end
+
     }
 }
