@@ -2,14 +2,17 @@ package com.miniproject.programming.dmaker.service;
 
 import com.miniproject.programming.dmaker.dto.CreateDeveloper;
 import com.miniproject.programming.dmaker.entity.Developer;
+import com.miniproject.programming.dmaker.exception.DMakerException;
 import com.miniproject.programming.dmaker.repository.DeveloperRepository;
 import com.miniproject.programming.dmaker.type.DeveloperLevel;
 import com.miniproject.programming.dmaker.type.DeveloperSkillType;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.miniproject.programming.dmaker.exception.DMakerErrorCode.DUPLICATED_MEMBER_ID;
+import static com.miniproject.programming.dmaker.exception.DMakerErrorCode.LEVEL_EXPERIENCE_YEARS_NOT_MATCHED;
 
 //비즈니스 로직을 담당해주는 부분이다.
 //서비스나 컨트롤러는 RequiredArgsConstructor를 사용하면 편하다.
@@ -40,18 +43,51 @@ public class DMakerService {
 
     @Transactional
     public void createDeveloper(CreateDeveloper.Request request) {
-            //business logic start
-            Developer developer = Developer.builder()
-                    .developerLevel(DeveloperLevel.JUNIOR)
-                    .developerSkillType(DeveloperSkillType.FRONT_END)
-                    .experienceYears(2)
-                    .name("Olaf")
-                    .age(5)
-                    .build();
 
-            //여기서 여러 db 관련 작업을 진행한다.
-            developerRepository.save(developer);
-            //business logic end
+        //비즈니스 검증
+        validateCreateDeveloperRequest(request);
+        //business logic start
+        Developer developer = Developer.builder()
+                .developerLevel(DeveloperLevel.JUNIOR)
+                .developerSkillType(DeveloperSkillType.FRONT_END)
+                .experienceYears(2)
+                .name("Olaf")
+                .age(5)
+                .build();
 
+        //여기서 여러 db 관련 작업을 진행한다.
+        developerRepository.save(developer);
+        //business logic end
+
+    }
+
+    private void validateCreateDeveloperRequest(CreateDeveloper.Request request) {
+        DeveloperLevel developerLevel = request.getDeveloperLevel();
+        Integer experienceYears = request.getExperienceYears();
+
+        if (developerLevel == DeveloperLevel.SENIOR && experienceYears < 10) {
+            //특정 비즈니스에서의 어떤 예외적인 상황이 발생했을 때, 이런 일반적인 Exception(RuntimeException) 말고 커스텀 익셉션을 사용해야 정확히 어떤 에러가 났는지
+            //확인할 수 있고 원하는 기능을 넣을 수 있기 때문에
+            //throw new RuntimeException("SENIOR need 10 years experience");
+            throw new DMakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
+        }
+
+        if (developerLevel == DeveloperLevel.JUNGNIOR &&
+                experienceYears < 4 || experienceYears >= 10) {
+            throw new DMakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
+        }
+
+        if (developerLevel == DeveloperLevel.JUNIOR && experienceYears >= 4) {
+            throw new DMakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
+        }
+
+//        Optional<Developer> developer =developerRepository.findByMemberId(request.getMemberId());
+//        if(developer.isPresent()) throw new DMakerException(DUPLICATED_MEMBER_ID);
+        //아래의 코드로 한번에 해결할 수 있다.
+        developerRepository.findByMemberId(request.getMemberId()).ifPresent(
+                developer -> {
+                    throw new DMakerException(DUPLICATED_MEMBER_ID);
+                }
+        );
     }
 }
