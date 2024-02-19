@@ -1,14 +1,14 @@
 package com.miniproject.programming.dmaker.controller;
 
 
-import com.miniproject.programming.dmaker.dto.CreateDeveloper;
-import com.miniproject.programming.dmaker.dto.DeveloperDetailDto;
-import com.miniproject.programming.dmaker.dto.DeveloperDto;
-import com.miniproject.programming.dmaker.dto.EditDeveloper;
+import com.miniproject.programming.dmaker.dto.*;
+import com.miniproject.programming.dmaker.exception.DMakerException;
 import com.miniproject.programming.dmaker.service.DMakerService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class DMakerController {
     }
 
     @GetMapping("/developer/{memberId}")
-    public DeveloperDetailDto getMemberDeveloper(@PathVariable String memberId){
+    public DeveloperDetailDto getMemberDeveloper(@PathVariable String memberId) {
         return dMakerService.getDeveloperDetail(memberId);
     }
 
@@ -54,9 +54,9 @@ public class DMakerController {
     // 패치는 우리가 해당 리소스 중에 특정 데이터만 수정을 해주겠다는 의미이다.
     @PutMapping("/developer/{memberId}")
     public DeveloperDetailDto editDeveloper(
-        @PathVariable String memberId,
-        @Valid @RequestBody EditDeveloper.Request request
-    ){
+            @PathVariable String memberId,
+            @Valid @RequestBody EditDeveloper.Request request
+    ) {
         log.info("PUT UPDATE");
 
         return dMakerService.editDeveloper(memberId, request);
@@ -65,11 +65,16 @@ public class DMakerController {
     @DeleteMapping("/developer/{memberId}")
     public DeveloperDetailDto deleteDeveloper(
             @PathVariable String memberId
-    ){
+    ) {
         log.info("");
 
         return dMakerService.deleteDeveloper(memberId);
     }
 
-
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    @ExceptionHandler(DMakerException.class)
+    public DMakerErrorResponse handleException(DMakerException e, HttpServletRequest request) {
+        log.error("errorCode: {}, url: {}, message: {}", e.getDMakerErrorCode(), request.getRequestURI(), e.getDetailMessage());
+        return DMakerErrorResponse.builder().errorCode(e.getDMakerErrorCode()).errorMessage(e.getDetailMessage()).build();
+    }
 }
