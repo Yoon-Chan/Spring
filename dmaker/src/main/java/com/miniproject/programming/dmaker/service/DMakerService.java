@@ -90,11 +90,11 @@ public class DMakerService {
         }
 
         if (developerLevel == DeveloperLevel.JUNGNIOR &&
-                experienceYears < 4 || experienceYears >= 10) {
+                experienceYears < 4 || experienceYears > 10) {
             throw new DMakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
         }
 
-        if (developerLevel == DeveloperLevel.JUNIOR && experienceYears >= 4) {
+        if (developerLevel == DeveloperLevel.JUNIOR && experienceYears > 4) {
             throw new DMakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
         }
     }
