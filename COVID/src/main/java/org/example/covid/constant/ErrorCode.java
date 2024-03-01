@@ -11,10 +11,10 @@ import java.util.function.Predicate;
 public enum ErrorCode {
 
     OK(0, ErrorCategory.NORMAL, "Ok"),
-    BAD_REQUEST(0, ErrorCategory.CLIENT_SIDE, "bad request"),
-    SPRING_BAD_REQUEST(0, ErrorCategory.CLIENT_SIDE, "Spring-detected bad request"),
-    INTERNAL_ERROR(0, ErrorCategory.SERVER_SIDE, "internal error"),
-    SPRING_INTERNAL_ERROR(0, ErrorCategory.SERVER_SIDE, "Spring-detected internal error");
+    BAD_REQUEST(10000, ErrorCategory.CLIENT_SIDE, "bad request"),
+    SPRING_BAD_REQUEST(10001, ErrorCategory.CLIENT_SIDE, "Spring-detected bad request"),
+    INTERNAL_ERROR(20000, ErrorCategory.SERVER_SIDE, "internal error"),
+    SPRING_INTERNAL_ERROR(20001, ErrorCategory.SERVER_SIDE, "Spring-detected internal error");
 
     private final Integer code;
     private final ErrorCategory errorCategory;

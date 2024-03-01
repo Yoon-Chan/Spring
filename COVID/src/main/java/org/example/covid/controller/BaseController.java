@@ -1,5 +1,6 @@
 package org.example.covid.controller;
 
+import org.example.covid.exception.GeneralException;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,13 +11,10 @@ public class BaseController implements ErrorController {
 
     //root 페이지
     @GetMapping("/")
-    public String root() {
-        return "index";
+    public String root() throws GeneralException {
+
+        throw  new GeneralException("테스트");
+        //return "index";
     }
 
-    //root 페이지
-    @RequestMapping("/error")
-    public String error() {
-        return "error";
-    }
 }

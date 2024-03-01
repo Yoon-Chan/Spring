@@ -1,5 +1,10 @@
 package org.example.covid.controller.api;
 
+import org.example.covid.constant.ErrorCode;
+import org.example.covid.dto.APIErrorResponse;
+import org.example.covid.exception.GeneralException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,7 +14,9 @@ import java.util.List;
 public class APIEventController {
 
     @GetMapping("/events")
-    public List<String> getEvents() { return List.of("event1", "event2"); }
+    public List<String> getEvents() {
+        return List.of("event1", "event2");
+    }
 
     @PostMapping("/events")
     public Boolean createEvent() { return true;}
@@ -22,4 +29,5 @@ public class APIEventController {
 
     @DeleteMapping("/event/{eventId}")
     public Boolean removeEvent(@PathVariable Integer eventId) { return true; }
+
 }
