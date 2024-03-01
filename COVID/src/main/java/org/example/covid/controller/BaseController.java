@@ -12,9 +12,7 @@ public class BaseController implements ErrorController {
     //root 페이지
     @GetMapping("/")
     public String root() throws GeneralException {
-
-        throw  new GeneralException("테스트");
-        //return "index";
+        return "index";
     }
 
 }
