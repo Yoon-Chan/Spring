@@ -13,34 +13,45 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-@DisplayName("View 컨트롤러 - 기본 페이지")
+@DisplayName("View 컨트롤러 - 인증")
 @WebMvcTest(
-        controllers = BaseController.class,
+        controllers = AuthController.class,
         excludeAutoConfiguration = SecurityAutoConfiguration.class,
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)
 )
-class BaseControllerTest {
+class AuthControllerTest {
 
     private final MockMvc mvc;
 
-    public BaseControllerTest(@Autowired MockMvc mvc) {
+    public AuthControllerTest(@Autowired MockMvc mvc) {
         this.mvc = mvc;
     }
 
-    @DisplayName("[view][GET] 기본 페이지 요청")
+    @DisplayName("[view][GET] 로그인 페이지")
     @Test
-    void givenNothing_whenRequestingRootPage_thenReturnsIndexPage() throws Exception {
+    void givenNothing_whenRequestingLoginPage_thenReturnsLoginPage() throws Exception {
         // Given
 
         // When & Then
-        mvc.perform(get("/"))
-                .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/events"))
-                .andExpect(view().name("redirect:/events"));
+        mvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("auth/login"));
+    }
+
+    @DisplayName("[view][GET] 어드민 회원 가입 페이지")
+    @Test
+    void givenNothing_whenRequestingSignUpPage_thenReturnsSignUpPage() throws Exception {
+        // Given
+
+        // When & Then
+        mvc.perform(get("/sign-up"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(content().string(containsString("This is sign-up page.")))
+                .andExpect(view().name("auth/sign-up"));
     }
 
 }
