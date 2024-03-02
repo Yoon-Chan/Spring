@@ -17,12 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@DisplayName("View 컨트롤러 - 기본 페이지")
-@WebMvcTest(
-        controllers = BaseController.class,
-        excludeAutoConfiguration = SecurityAutoConfiguration.class,
-        excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)
-)
+@WebMvcTest(BaseController.class)
 class BaseControllerTest {
 
     private final MockMvc mvc;
@@ -38,9 +33,11 @@ class BaseControllerTest {
 
         // When & Then
         mvc.perform(get("/"))
-                .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/events"))
-                .andExpect(view().name("redirect:/events"));
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(content().string(containsString("This is default page.")))
+                .andExpect(view().name("index"))
+                .andDo(print());
     }
 
 }

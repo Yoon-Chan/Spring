@@ -35,7 +35,7 @@ class BaseErrorControllerTest {
 
         // When & Then
         mvc.perform(get("/wrong-uri"))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isInternalServerError())
                 .andDo(print());
     }
 

@@ -3,7 +3,7 @@ package org.example.covid.controller.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.covid.constant.ErrorCode;
 import org.example.covid.constant.PlaceType;
-import org.junit.jupiter.api.Disabled;
+import org.example.covid.dto.PlaceRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Deprecated
-@Disabled("API 컨트롤러가 필요없는 상황이어서 비활성화")
-@DisplayName("API 컨트롤러 - 장소")
 @WebMvcTest(APIPlaceController.class)
 class ApiPlaceControllerTest {
 
@@ -58,7 +54,6 @@ class ApiPlaceControllerTest {
     void givenPlace_whenCreatingAPlace_thenReturnsSuccessfulStandardResponse() throws Exception {
         // Given
         PlaceRequest placeRequest = PlaceRequest.of(
-                null,
                 PlaceType.COMMON,
                 "랄라배드민턴장",
                 "서울시 강남구 강남대로 1234",
@@ -124,7 +119,6 @@ class ApiPlaceControllerTest {
         // Given
         long placeId = 1L;
         PlaceRequest placeRequest = PlaceRequest.of(
-                null,
                 PlaceType.COMMON,
                 "랄라배드민턴장",
                 "서울시 강남구 강남대로 1234",

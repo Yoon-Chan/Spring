@@ -11,12 +11,10 @@ public class AuthController {
         return "auth/login";
     }
 
-
     @GetMapping("/sign-up")
     public String signUp() {
         return "auth/sign-up";
     }
-
 
 
 }

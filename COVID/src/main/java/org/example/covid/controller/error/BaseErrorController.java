@@ -20,11 +20,14 @@ public class BaseErrorController implements ErrorController {
     public ModelAndView errorHtml(HttpServletResponse response) {
         HttpStatus status = HttpStatus.valueOf(response.getStatus());
         ErrorCode errorCode = status.is4xxClientError() ? ErrorCode.BAD_REQUEST : ErrorCode.INTERNAL_ERROR;
+
         return new ModelAndView(
-                "error"
-                , Map.of("statusCode", status.value(),
-                "errorCode", errorCode,
-                "message", errorCode.getMessage(status.getReasonPhrase())),
+                "error",
+                Map.of(
+                        "statusCode", status.value(),
+                        "errorCode", errorCode,
+                        "message", errorCode.getMessage(status.getReasonPhrase())
+                ),
                 status
         );
     }
@@ -33,8 +36,9 @@ public class BaseErrorController implements ErrorController {
     public ResponseEntity<APIErrorResponse> error(HttpServletResponse response) {
         HttpStatus status = HttpStatus.valueOf(response.getStatus());
         ErrorCode errorCode = status.is4xxClientError() ? ErrorCode.BAD_REQUEST : ErrorCode.INTERNAL_ERROR;
-        return ResponseEntity.status(status)
-                .body(APIErrorResponse.of(
-                        false, errorCode));
+
+        return ResponseEntity
+                .status(status)
+                .body(APIErrorResponse.of(false, errorCode));
     }
 }

@@ -20,4 +20,8 @@ public class APIDataResponse<T> extends APIErrorResponse {
     public static <T> APIDataResponse<T> of(T data) {
         return new APIDataResponse<>(data);
     }
+
+    public static <T> APIDataResponse<T> empty() {
+        return new APIDataResponse<>(null);
+    }
 }
