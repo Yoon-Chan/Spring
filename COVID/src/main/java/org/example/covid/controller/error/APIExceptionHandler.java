@@ -1,9 +1,9 @@
 package org.example.covid.controller.error;
 
+import jakarta.validation.ConstraintViolationException;
 import org.example.covid.constant.ErrorCode;
 import org.example.covid.dto.APIErrorResponse;
 import org.example.covid.exception.GeneralException;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
