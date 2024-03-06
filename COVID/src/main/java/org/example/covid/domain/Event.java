@@ -1,7 +1,10 @@
 package org.example.covid.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.example.covid.constant.EventStatus;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -9,12 +12,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @ToString
-@EqualsAndHashCode
 @Table(indexes = {
-        @Index(columnList = "placeId"),
         @Index(columnList = "eventName"),
         @Index(columnList = "eventStartDatetime"),
         @Index(columnList = "eventEndDatetime"),
@@ -48,14 +50,17 @@ public class Event {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime eventStartDatetime;
 
-    @Setter @Column(nullable = false, columnDefinition = "datetime")
+    @Setter
+    @Column(nullable = false, columnDefinition = "datetime")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime eventEndDatetime;
 
-    @Setter @Column(nullable = false, columnDefinition = "integer default 0")
+    @Setter
+    @Column(nullable = false, columnDefinition = "integer default 0")
     private Integer currentNumberOfPeople;
 
-    @Setter @Column(nullable = false)
+    @Setter
+    @Column(nullable = false)
     private Integer capacity;
 
     @Setter
@@ -73,7 +78,8 @@ public class Event {
     private LocalDateTime modifiedAt;
 
 
-    protected Event() {}
+    protected Event() {
+    }
 
     protected Event(
             Long placeId,
@@ -115,6 +121,18 @@ public class Event {
                 capacity,
                 memo
         );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        return id != null && id.equals(((Event) obj).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(eventName, eventStartDatetime, eventEndDatetime, createdAt, modifiedAt);
     }
 
 }

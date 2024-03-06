@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 public class AdminPlaceMap {
+
     @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +31,6 @@ public class AdminPlaceMap {
     @Setter
     @Column(nullable = false)
     private Long adminId;
-    private Long PlaceId;
 
     @Setter
     @Column(nullable = false)
@@ -58,4 +58,5 @@ public class AdminPlaceMap {
     public static AdminPlaceMap of(Long adminId, Long placeId) {
         return new AdminPlaceMap(adminId, placeId);
     }
+
 }

@@ -18,6 +18,7 @@ public record EventDTO(
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {
+
     public static EventDTO of(
             Long id,
             Long placeId,
