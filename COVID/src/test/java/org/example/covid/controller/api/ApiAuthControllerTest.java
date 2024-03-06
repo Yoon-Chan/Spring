@@ -14,6 +14,7 @@ import org.example.covid.dto.AdminRequest;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@DisplayName("API 컨트롤러 - 인증")
 @WebMvcTest(APIAuthController.class)
 class ApiAuthControllerTest {
 
