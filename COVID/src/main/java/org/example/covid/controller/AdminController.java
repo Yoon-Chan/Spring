@@ -74,6 +74,7 @@ public class AdminController {
     public ModelAndView adminEventDetail(@PathVariable Long eventId) {
         Map<String, Object> map = new HashMap<>();
         map.put("event", EventDTO.of(
+                eventId,
                 1L,
                 "오후 운동",
                 EventStatus.OPENED,

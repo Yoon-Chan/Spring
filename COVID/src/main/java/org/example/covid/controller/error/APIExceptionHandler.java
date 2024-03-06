@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.example.covid.constant.ErrorCode;
 import org.example.covid.dto.APIErrorResponse;
 import org.example.covid.exception.GeneralException;
+import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-@RestControllerAdvice(annotations = RestController.class)
+@RestControllerAdvice(annotations = {RestController.class, RepositoryRestController.class})
 public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler

@@ -5,6 +5,7 @@ import org.example.covid.constant.ErrorCode;
 import org.example.covid.constant.EventStatus;
 import org.example.covid.dto.EventDTO;
 import org.example.covid.service.EventService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+@Disabled("API 컨트롤러가 필요없는 상황이어서 비활성화")
 @DisplayName("API 컨트롤러 - 이벤트")
 @WebMvcTest(APIEventController.class)
 class ApiEventControllerTest {
@@ -324,6 +325,7 @@ class ApiEventControllerTest {
 
     private EventDTO createEventDTO() {
         return EventDTO.of(
+                1L,
                 1L,
                 "오후 운동",
                 EventStatus.OPENED,

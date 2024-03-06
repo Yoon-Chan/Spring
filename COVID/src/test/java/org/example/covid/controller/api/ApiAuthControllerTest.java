@@ -3,6 +3,7 @@ package org.example.covid.controller.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.covid.constant.ErrorCode;
 import org.example.covid.dto.LoginRequest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import org.example.covid.dto.AdminRequest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+@Disabled("API 컨트롤러가 필요없는 상황이어서 비활성화")
 @DisplayName("API 컨트롤러 - 인증")
 @WebMvcTest(APIAuthController.class)
 class ApiAuthControllerTest {

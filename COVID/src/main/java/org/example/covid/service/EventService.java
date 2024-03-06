@@ -1,12 +1,12 @@
 package org.example.covid.service;
 
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.example.covid.constant.ErrorCode;
 import org.example.covid.constant.EventStatus;
 import org.example.covid.dto.EventDTO;
 import org.example.covid.exception.GeneralException;
 import org.example.covid.repository.EventRepository;
-import org.hibernate.sql.ast.tree.predicate.Predicate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,7 +30,6 @@ public class EventService {
         }
     }
 
-
     public List<EventDTO> getEvents(
             Long placeId,
             String eventName,
@@ -39,25 +38,16 @@ public class EventService {
             LocalDateTime eventEndDatetime
     ) {
         try {
-//            return eventRepository.findEvents(
-//                    placeId,
-//                    eventName,
-//                    eventStatus,
-//                    eventStartDatetime,
-//                    eventEndDatetime
-//            );
             return null;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
         }
     }
 
-    public Optional<EventDTO> getEvent(Long eventId){
+    public Optional<EventDTO> getEvent(Long eventId) {
         try {
             return eventRepository.findById(eventId).map(EventDTO::of);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
         }
     }
@@ -70,13 +60,12 @@ public class EventService {
 
             eventRepository.save(eventDTO.toEntity());
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
         }
     }
 
-    public boolean modifyEvent(Long eventId ,EventDTO dto){
+    public boolean modifyEvent(Long eventId, EventDTO dto) {
         try {
             if (eventId == null || dto == null) {
                 return false;
@@ -86,8 +75,7 @@ public class EventService {
                     .ifPresent(event -> eventRepository.save(dto.updateEntity(event)));
 
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
         }
     }
@@ -100,10 +88,8 @@ public class EventService {
 
             eventRepository.deleteById(eventId);
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
         }
     }
-
 }
