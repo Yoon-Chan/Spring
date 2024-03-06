@@ -2,7 +2,6 @@ package org.example.covid.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.example.covid.constant.PlaceType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,40 +12,33 @@ import java.time.LocalDateTime;
 @ToString
 @EqualsAndHashCode
 @Table(indexes = {
-        @Index(columnList = "placeName"),
-        @Index(columnList = "address"),
         @Index(columnList = "phoneNumber"),
         @Index(columnList = "createdAt"),
         @Index(columnList = "modifiedAt")
 })
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-public class Place {
+public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 
     @Setter
-    @Column(nullable = false, columnDefinition = "varchar default 'COMMON'")
-    @Enumerated(EnumType.STRING)
-    private PlaceType placeType;
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Setter
+    @Column(nullable = false, unique = true)
+    private String nickname;
 
     @Setter
     @Column(nullable = false)
-    private String placeName;
-
-    @Setter
-    @Column(nullable = false)
-    private String address;
+    private String password;
 
     @Setter
     @Column(nullable = false)
     private String phoneNumber;
-
-    @Setter
-    @Column(nullable = false, columnDefinition = "integer default 0")
-    private Integer capacity;
 
 
     @Setter
@@ -64,32 +56,18 @@ public class Place {
     private LocalDateTime modifiedAt;
 
 
-    protected Place() {}
+    protected Admin() {}
 
-    protected Place(
-            PlaceType placeType,
-            String placeName,
-            String address,
-            String phoneNumber,
-            Integer capacity,
-            String memo
-    ) {
-        this.placeType = placeType;
-        this.placeName = placeName;
-        this.address = address;
+    protected Admin(String email, String nickname, String password, String phoneNumber, String memo) {
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
         this.phoneNumber = phoneNumber;
-        this.capacity = capacity;
         this.memo = memo;
     }
 
-    public static Place of(
-            PlaceType placeType,
-            String placeName,
-            String address,
-            String phoneNumber,
-            Integer capacity,
-            String memo
-    ) {
-        return new Place(placeType, placeName, address, phoneNumber, capacity, memo);
+    public static Admin of(String email, String nickname, String password, String phoneNumber, String memo) {
+        return new Admin(email, nickname, password, phoneNumber, memo);
     }
+
 }
