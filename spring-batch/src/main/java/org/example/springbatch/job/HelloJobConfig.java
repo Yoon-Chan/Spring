@@ -16,32 +16,32 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-//@Configuration
-//@RequiredArgsConstructor
-//public class HelloJobConfig {
-//
-//    @Bean
-//    public Job helloJob(JobRepository jobRepository, Step helloStep) {
-//        return new JobBuilder("helloJob", jobRepository)
-//                .incrementer(new RunIdIncrementer())
-//                .start(helloStep)
-//                .build();
-//    }
-//
-//    @JobScope
-//    @Bean
-//    public Step helloStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, Tasklet tasklet) {
-//        return new StepBuilder("helloStep", jobRepository)
-//                .tasklet(tasklet, transactionManager)
-//                .build();
-//    }
-//
-//    @StepScope
-//    @Bean
-//    public Tasklet myTasklet() {
-//        return (contribution, chunkContext) -> {
-//            System.out.println("Hello Spring Batch");
-//            return RepeatStatus.FINISHED;
-//        };
-//    }
-//}
+@Configuration
+@RequiredArgsConstructor
+public class HelloJobConfig {
+
+    @Bean
+    public Job helloJob(JobRepository jobRepository, Step helloStep) {
+        return new JobBuilder("helloJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .start(helloStep)
+                .build();
+    }
+
+    @JobScope
+    @Bean
+    public Step helloStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, Tasklet tasklet) {
+        return new StepBuilder("helloStep", jobRepository)
+                .tasklet(tasklet, transactionManager)
+                .build();
+    }
+
+    @StepScope
+    @Bean
+    public Tasklet myTasklet() {
+        return (contribution, chunkContext) -> {
+            System.out.println("Hello Spring Batch");
+            return RepeatStatus.FINISHED;
+        };
+    }
+}

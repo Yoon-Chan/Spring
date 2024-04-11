@@ -11,12 +11,12 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "plain_text")
+@Table(name = "result_text")
 //entity의 일부 컬럼만 변경이 되었을 때, 그 값들에 대해서만 변경되는 쿼리가 실행되도록 업데이트 된다.
 @DynamicUpdate
-public class PlainText {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ResultText {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

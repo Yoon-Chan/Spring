@@ -3,7 +3,9 @@ package org.example.springbatch.job;
 
 import lombok.RequiredArgsConstructor;
 import org.example.springbatch.core.domain.PlainText;
+import org.example.springbatch.core.domain.ResultText;
 import org.example.springbatch.core.repository.PlainTextRepository;
+import org.example.springbatch.core.repository.ResultTextRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
@@ -32,9 +34,10 @@ import java.util.List;
 public class PlainTextJobConfig {
 
     private final PlainTextRepository plainTextRepository;
+    private final ResultTextRepository resultTextRepository;
 
     @Bean
-    public Job helloJob(JobRepository jobRepository, Step helloStep) {
+    public Job plainTextJob(JobRepository jobRepository, Step helloStep) {
         return new JobBuilder("plainTextJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(helloStep)
@@ -43,7 +46,7 @@ public class PlainTextJobConfig {
 
     @JobScope
     @Bean
-    public Step helloStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step plainTextStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("plainStep", jobRepository)
                 .<PlainText, String>chunk(5, transactionManager)
                 .reader(plainTextReader())
@@ -75,8 +78,9 @@ public class PlainTextJobConfig {
     @Bean
     public ItemWriter<String> plainTextWriter() {
         return items -> {
-            items.forEach(System.out::println);
-            System.out.println("=== chunck is finished ===");
+            items.forEach(item -> resultTextRepository.save(new ResultText(null, item)));
+//            items.forEach(System.out::println);
+//            System.out.println("=== chunck is finished ===");
         };
     }
 }
