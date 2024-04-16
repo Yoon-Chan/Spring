@@ -52,13 +52,14 @@ public class AptDeal {
     private LocalDateTime updatedAt;
 
 
-    public static AptDeal from(AptDealDto dto) {
+    public static AptDeal from(AptDealDto dto, Apt apt) {
         AptDeal aptDeal = new AptDeal();
         aptDeal.setExclusiveArea(dto.getExclusiveArea());
         aptDeal.setDealDate(dto.getDealDate());
         aptDeal.setDealAmount(dto.getDealAmount());
         aptDeal.setDealCanceled(dto.isDealCanceled());
         aptDeal.setDealCanceledDate(dto.getDealCanceledDate());
+        aptDeal.setApt(apt);
         return aptDeal;
     }
 }

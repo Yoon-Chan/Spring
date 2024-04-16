@@ -7,6 +7,7 @@ import org.example.springbatchproject.core.dto.AptDealDto;
 import org.example.springbatchproject.core.repository.LawdRepository;
 import org.example.springbatchproject.job.validator.LawdCdParameterValidator;
 import org.example.springbatchproject.job.validator.YearMonthParameterValidator;
+import org.example.springbatchproject.service.AptDealService;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -156,9 +157,10 @@ public class AptDealInsertJobConfig {
 
     @Bean
     @StepScope
-    public ItemWriter<AptDealDto> aptDealWriter() {
+    public ItemWriter<AptDealDto> aptDealWriter(AptDealService aptDealService) {
         return chunk -> {
-            chunk.forEach(System.out::println);
+            chunk.forEach(aptDealService::upsert);
+            System.out.println("=============== Write Completed ================");
         };
     }
 }
