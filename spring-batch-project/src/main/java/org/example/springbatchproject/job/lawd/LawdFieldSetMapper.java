@@ -15,7 +15,7 @@ public class LawdFieldSetMapper implements FieldSetMapper<Lawd> {
     @Override
     public Lawd mapFieldSet(FieldSet fieldSet) throws BindException {
         Lawd lawd = new Lawd();
-        lawd.setLawdcd(fieldSet.readString(LAWD_CD));
+        lawd.setLawdCd(fieldSet.readString(LAWD_CD));
         lawd.setLawdDong(fieldSet.readString(LAWD_DONG));
         lawd.setExist(fieldSet.readBoolean(EXIST, EXIST_TRUE));
         return lawd;

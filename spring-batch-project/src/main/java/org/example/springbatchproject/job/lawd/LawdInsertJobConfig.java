@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.springbatchproject.core.entity.Lawd;
 import org.example.springbatchproject.job.validator.FilePathParameterValidator;
+import org.example.springbatchproject.service.LawdService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
@@ -27,6 +28,8 @@ import static org.example.springbatchproject.job.lawd.LawdFieldSetMapper.*;
 @RequiredArgsConstructor
 @Slf4j
 public class LawdInsertJobConfig {
+
+    private final LawdService lawdService;
 
     @Bean
     public Job lawdInsertJob(
@@ -71,6 +74,6 @@ public class LawdInsertJobConfig {
     @Bean
     @StepScope
     public ItemWriter<Lawd> lawditemWriter() {
-        return (item) -> item.forEach(System.out::println);
+        return (item) -> item.forEach(lawdService::upsert);
     }
 }

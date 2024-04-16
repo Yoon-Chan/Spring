@@ -25,7 +25,7 @@ public class Lawd {
     private Long lawdId;
 
     @Column(nullable = false)
-    private String lawdcd;
+    private String lawdCd;
 
     @Column(nullable = false)
     private String lawdDong;
