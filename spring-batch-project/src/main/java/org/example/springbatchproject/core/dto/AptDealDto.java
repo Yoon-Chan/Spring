@@ -1,9 +1,14 @@
 package org.example.springbatchproject.core.dto;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 @ToString
@@ -49,4 +54,22 @@ public class AptDealDto {
 
     @XmlElement(name = "해제여부")
     private String dealCanceled;
+
+    public LocalDate getDealDate() {
+        return LocalDate.of(year, month, day);
+    }
+
+    public Long getDealAmount() {
+        return Long.parseLong(dealAmount.replaceAll(",", "").trim());
+    }
+
+    public boolean isDealCanceled() {
+        return "O".equals(dealCanceled.trim());
+    }
+
+    public LocalDate getDealCanceledDate() {
+        if(StringUtils.isBlank(dealCanceledDate)) return null;
+
+        return LocalDate.parse(dealCanceledDate.trim(), DateTimeFormatter.ofPattern("yy.MM.dd"));
+    }
 }
