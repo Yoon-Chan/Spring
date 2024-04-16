@@ -5,10 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.springbatchproject.adapter.ApartmentApiResource;
 import org.example.springbatchproject.core.dto.AptDealDto;
 import org.example.springbatchproject.job.validator.FilePathParameterValidator;
+import org.example.springbatchproject.job.validator.LawdCdParameterValidator;
+import org.example.springbatchproject.job.validator.YearMonthParameterValidator;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.CompositeJobParametersValidator;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -25,6 +29,7 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.time.YearMonth;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -39,8 +44,18 @@ public class AptDealInsertJobConfig {
             @Qualifier("aptDealInsertStep") Step aptDealInsertStep) {
         return new JobBuilder("aptDealInsertJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
+                .validator(apartDealJobParametersValidator())
                 .start(aptDealInsertStep)
                 .build();
+    }
+
+    private JobParametersValidator apartDealJobParametersValidator() {
+        CompositeJobParametersValidator validator = new CompositeJobParametersValidator();
+        validator.setValidators(List.of(
+                new LawdCdParameterValidator(),
+                new YearMonthParameterValidator()
+        ));
+        return validator;
     }
 
     @Bean
@@ -61,10 +76,12 @@ public class AptDealInsertJobConfig {
     @Bean
     @StepScope
     public StaxEventItemReader<AptDealDto> aptDealResourceReader(
+            @Value("#{jobParameters['yearMonth']}") String yearMonthStr,
+            @Value("#{jobParameters['lawdCd']}") String lawdCd,
             Jaxb2Marshaller jaxb2Marshaller) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
                 .name("aptDealResourceReader")
-                .resource(apartmentApiResource.getResource("41135", YearMonth.of(2021, 7)))
+                .resource(apartmentApiResource.getResource(lawdCd, YearMonth.parse(yearMonthStr)))
                 //내가 읽어낼 루트 element 설정하기
                 .addFragmentRootElements("item")
                 //파일을 객체에 매핑할 때 사용.
