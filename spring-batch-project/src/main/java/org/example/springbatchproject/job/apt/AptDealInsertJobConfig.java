@@ -40,7 +40,7 @@ import java.util.List;
 public class AptDealInsertJobConfig {
 
     private final ApartmentApiResource apartmentApiResource;
-    private final LawdRepository lawdRepository;
+
 
 
     @Bean
@@ -52,7 +52,7 @@ public class AptDealInsertJobConfig {
     ) {
         return new JobBuilder("aptDealInsertJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
-                .validator(apartDealJobParametersValidator())
+                .validator(new YearMonthParameterValidator())
                 .start(guLawdCdStep)
                 .on("CONTINUABLE").to(contextPrintStep).next(guLawdCdStep)
                 .from(guLawdCdStep).on("*").end()
@@ -60,14 +60,13 @@ public class AptDealInsertJobConfig {
                 .build();
     }
 
-    private JobParametersValidator apartDealJobParametersValidator() {
-        CompositeJobParametersValidator validator = new CompositeJobParametersValidator();
-        validator.setValidators(List.of(
-                //new LawdCdParameterValidator(),
-                new YearMonthParameterValidator()
-        ));
-        return validator;
-    }
+//    private JobParametersValidator apartDealJobParametersValidator() {
+//        CompositeJobParametersValidator validator = new CompositeJobParametersValidator();
+//        validator.setValidators(List.of(
+//                new YearMonthParameterValidator()
+//        ));
+//        return validator;
+//    }
 
     @Bean
     @JobScope
@@ -102,49 +101,8 @@ public class AptDealInsertJobConfig {
     * */
     @StepScope
     @Bean
-    public Tasklet guLawdCdTasklet(JobRepository jobRepository) {
-        return (contribution, chunkContext) -> {
-
-            //step 간 데이터 전달
-            StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
-            ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
-
-            //List<String> guLawdCds = lawdRepository.findDistinctGuLawdCd();
-
-            //데이터 하나 전달
-//            System.out.println("[guLawdCdTasklet] guLawdCd : " + guLawdCds.get(0));
-//            executionContext.putString("guLawdCd", guLawdCds.get(0));
-
-            //데이터가 있으면 다음 스텝을 실행하도록 하고, 데이터가 없으면 종료되도록 한다.
-            //데이터가 있으면 -> CONTINUABLE
-            // 1. guLawdCdList
-            // 2. guLawdCd
-            // 3. itemCount
-
-            List<String> guLawdCds;
-
-            if(!executionContext.containsKey("guLawdCdList")){
-                guLawdCds = lawdRepository.findDistinctGuLawdCd();
-                executionContext.put("guLawdCdList", guLawdCds);
-                executionContext.putInt("itemCount", guLawdCds.size());
-            }else {
-                guLawdCds = (List<String>)executionContext.get("guLawdCdList");
-            }
-
-            Integer itemCount = executionContext.getInt("itemCount");
-            if(itemCount == 0){
-                contribution.setExitStatus(ExitStatus.COMPLETED);
-                return RepeatStatus.FINISHED;
-            }
-
-            itemCount--;
-            String guLawdCd = guLawdCds.get(itemCount);
-            executionContext.putString("guLawdCd", guLawdCd);
-            executionContext.putInt("itemCount", itemCount);
-
-            contribution.setExitStatus(new ExitStatus("CONTINUABLE"));
-            return RepeatStatus.FINISHED;
-        };
+    public Tasklet guLawdCdTasklet(LawdRepository lawdRepository) {
+        return new GuLawdTasklet(lawdRepository);
     }
 
     @JobScope
