@@ -15,7 +15,7 @@ public class DealDateParameterValidator implements JobParametersValidator {
     @Override
     public void validate(JobParameters parameters) throws JobParametersInvalidException {
         String dealDate = parameters.getString(DEAL_DATE);
-        if(StringUtils.hasText(dealDate)){
+        if(!StringUtils.hasText(dealDate)){
             throw new JobParametersInvalidException(DEAL_DATE + "가 빈 문자열이거나 존재하지 않습니다.");
         }
 

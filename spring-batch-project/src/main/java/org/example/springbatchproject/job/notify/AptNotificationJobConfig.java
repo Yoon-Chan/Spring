@@ -3,10 +3,13 @@ package org.example.springbatchproject.job.notify;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.springbatchproject.core.dto.AptDto;
 import org.example.springbatchproject.core.dto.NotificationDto;
 import org.example.springbatchproject.core.entity.AptNotification;
 import org.example.springbatchproject.core.repository.AptNotificationRepository;
+import org.example.springbatchproject.core.repository.LawdRepository;
 import org.example.springbatchproject.job.validator.DealDateParameterValidator;
+import org.example.springbatchproject.service.AptDealService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
@@ -20,13 +23,16 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -70,17 +76,35 @@ public class AptNotificationJobConfig {
                 .repository(aptNotificationRepository)
                 .methodName("findByEnabledIsTrue")
                 .pageSize(10)
-                .arguments(Arrays.asList())
+                .arguments(List.of())
                 .sorts(Collections.singletonMap("aptNotificationId", Sort.Direction.DESC))
                 .build();
     }
 
     @StepScope
     @Bean
-    public ItemProcessor<AptNotification, NotificationDto> aptNotificationItemProcessor() {
-        return item -> {
+    public ItemProcessor<AptNotification, NotificationDto> aptNotificationItemProcessor(
+            @Value("#{jobParameters['dealDate']}") String dealDate,
+            AptDealService aptDealService,
+            LawdRepository lawdRepository
+    ) {
+        return aptNotification -> {
 
-            return null;
+            List<AptDto> aptDtoList =
+                    aptDealService.findByGuLawdAndDealDate(aptNotification.getGuLawdCd(), LocalDate.parse(dealDate));
+
+            if(aptDtoList.isEmpty()) { return null; }
+
+            String guName =
+                    lawdRepository.findByLawdCd(aptNotification.getGuLawdCd() + "00000").orElseThrow().getLawdDong();
+
+
+            return NotificationDto.builder()
+                    .email(aptNotification.getEmail())
+                    .guName(guName)
+                    .count(aptDtoList.size())
+                    .aptDeals(aptDtoList)
+                    .build();
         };
     }
 
@@ -88,8 +112,7 @@ public class AptNotificationJobConfig {
     @Bean
     public ItemWriter<NotificationDto> aptNotificationItemWriter() {
         return chunk -> {
-
-
+            chunk.forEach(item -> System.out.println(item.toMessage()));
         };
     }
 
