@@ -54,8 +54,9 @@ public class AptDealInsertJobConfig {
                 .incrementer(new RunIdIncrementer())
                 .validator(apartDealJobParametersValidator())
                 .start(guLawdCdStep)
-                .next(contextPrintStep)
-                .next(aptDealInsertStep)
+                .on("CONTINUABLE").to(contextPrintStep).next(guLawdCdStep)
+                .from(guLawdCdStep).on("*").end()
+                .end()
                 .build();
     }
 
@@ -92,6 +93,13 @@ public class AptDealInsertJobConfig {
                 .build();
     }
 
+    /*
+    *   ExecutionContext에 저장할 데이터
+    *   1. guLawdCdList - 구 코드 리스트
+    *   2. guLawdCd - 구 코드 -> 다음 스텝에서 활용할 값.
+    *   3. itemCount - 남아있는 구 코드의 개수
+    *
+    * */
     @StepScope
     @Bean
     public Tasklet guLawdCdTasklet(JobRepository jobRepository) {
@@ -101,13 +109,40 @@ public class AptDealInsertJobConfig {
             StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
             ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
 
-            List<String> guLawdCds = lawdRepository.findDistinctGuLawdCd();
+            //List<String> guLawdCds = lawdRepository.findDistinctGuLawdCd();
 
             //데이터 하나 전달
-            System.out.println("[guLawdCdTasklet] guLawdCd : " + guLawdCds.get(0));
-            executionContext.putString("guLawdCd", guLawdCds.get(0));
+//            System.out.println("[guLawdCdTasklet] guLawdCd : " + guLawdCds.get(0));
+//            executionContext.putString("guLawdCd", guLawdCds.get(0));
 
+            //데이터가 있으면 다음 스텝을 실행하도록 하고, 데이터가 없으면 종료되도록 한다.
+            //데이터가 있으면 -> CONTINUABLE
+            // 1. guLawdCdList
+            // 2. guLawdCd
+            // 3. itemCount
 
+            List<String> guLawdCds;
+
+            if(!executionContext.containsKey("guLawdCdList")){
+                guLawdCds = lawdRepository.findDistinctGuLawdCd();
+                executionContext.put("guLawdCdList", guLawdCds);
+                executionContext.putInt("itemCount", guLawdCds.size());
+            }else {
+                guLawdCds = (List<String>)executionContext.get("guLawdCdList");
+            }
+
+            Integer itemCount = executionContext.getInt("itemCount");
+            if(itemCount == 0){
+                contribution.setExitStatus(ExitStatus.COMPLETED);
+                return RepeatStatus.FINISHED;
+            }
+
+            itemCount--;
+            String guLawdCd = guLawdCds.get(itemCount);
+            executionContext.putString("guLawdCd", guLawdCd);
+            executionContext.putInt("itemCount", itemCount);
+
+            contribution.setExitStatus(new ExitStatus("CONTINUABLE"));
             return RepeatStatus.FINISHED;
         };
     }
@@ -128,7 +163,7 @@ public class AptDealInsertJobConfig {
             @Value("#{jobExecutionContext['guLawdCd']}") String guLawdCd) {
         return (contribution, chunkContext) -> {
             System.out.println("[contextPrintTasklet] guLawdCd : " + guLawdCd);
-            Object str = chunkContext.getStepContext().getJobExecutionContext().get("guLawdCd");
+            String str = chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().getString("guLawdCd");
 
             System.out.println("[contextPrintTasklet] guLawdCd : " + guLawdCd);
             System.out.println("[contextPrintTasklet] str : " + str);
