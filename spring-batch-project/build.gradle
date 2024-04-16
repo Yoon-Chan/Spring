@@ -35,10 +35,10 @@ dependencies {
 
     //xml 관련 의존성 주입
     implementation 'org.springframework:spring-oxm'
-    implementation 'javax.xml.bind:jaxb-api:2.2.11'
-    implementation 'com.sum.xml.bind:jaxb-core:2.2.11'
-    implementation 'com.sun.xml.bind:jaxb-impl:2.2.11'
-    implementation 'javax.activation:activation:1.1.1'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+//    implementation 'com.sun.xml.bind:jaxb-impl:2.2.11'
+//    implementation 'javax.activation:activation:1.1.1'
 }
 
 tasks.named('test') {
