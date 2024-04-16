@@ -2,6 +2,7 @@ package org.example.springbatchproject.job.apt;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.springbatchproject.adapter.ApartmentApiResource;
 import org.example.springbatchproject.core.dto.AptDealDto;
 import org.example.springbatchproject.job.validator.FilePathParameterValidator;
 import org.springframework.batch.core.Job;
@@ -23,10 +24,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.time.YearMonth;
+
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
 public class AptDealInsertJobConfig {
+
+    private final ApartmentApiResource apartmentApiResource;
 
     @Bean
     public Job aptDealInsertJob(
@@ -34,7 +39,6 @@ public class AptDealInsertJobConfig {
             @Qualifier("aptDealInsertStep") Step aptDealInsertStep) {
         return new JobBuilder("aptDealInsertJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
-                .validator(new FilePathParameterValidator())
                 .start(aptDealInsertStep)
                 .build();
     }
@@ -57,11 +61,10 @@ public class AptDealInsertJobConfig {
     @Bean
     @StepScope
     public StaxEventItemReader<AptDealDto> aptDealResourceReader(
-            @Value("#{jobParameters['filePath']}") String filePath,
             Jaxb2Marshaller jaxb2Marshaller) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
                 .name("aptDealResourceReader")
-                .resource(new ClassPathResource(filePath))
+                .resource(apartmentApiResource.getResource("41135", YearMonth.of(2021, 7)))
                 //내가 읽어낼 루트 element 설정하기
                 .addFragmentRootElements("item")
                 //파일을 객체에 매핑할 때 사용.
