@@ -4,6 +4,7 @@ package org.example.springbatchproject.core.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.example.springbatchproject.core.dto.AptDealDto;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,12 +15,13 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @Table(name = "apt_deal")
+@DynamicUpdate
 @EntityListeners(AuditingEntityListener.class)
 public class AptDeal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long aptDealId;
 
     @ManyToOne
     @JoinColumn(name = "apt_id")
@@ -52,14 +54,15 @@ public class AptDeal {
     private LocalDateTime updatedAt;
 
 
-    public static AptDeal from(AptDealDto dto, Apt apt) {
+    public static AptDeal of(AptDealDto dto, Apt apt) {
         AptDeal aptDeal = new AptDeal();
+        aptDeal.setApt(apt);
         aptDeal.setExclusiveArea(dto.getExclusiveArea());
         aptDeal.setDealDate(dto.getDealDate());
+        aptDeal.setFloor(dto.getFloor());
         aptDeal.setDealAmount(dto.getDealAmount());
         aptDeal.setDealCanceled(dto.isDealCanceled());
         aptDeal.setDealCanceledDate(dto.getDealCanceledDate());
-        aptDeal.setApt(apt);
         return aptDeal;
     }
 }

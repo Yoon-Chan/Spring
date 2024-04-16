@@ -48,14 +48,14 @@ public class AptDealInsertJobConfig {
     public Job aptDealInsertJob(
             JobRepository jobRepository,
             @Qualifier("aptDealInsertStep") Step aptDealInsertStep,
-            @Qualifier("guLawdCdStep") Step guLawdCdStep,
-            @Qualifier("contextPrintStep") Step contextPrintStep
+            @Qualifier("guLawdCdStep") Step guLawdCdStep
+            //@Qualifier("contextPrintStep") Step contextPrintStep
     ) {
         return new JobBuilder("aptDealInsertJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .validator(new YearMonthParameterValidator())
                 .start(guLawdCdStep)
-                .on("CONTINUABLE").to(contextPrintStep).next(guLawdCdStep)
+                .on("CONTINUABLE").to(aptDealInsertStep).next(guLawdCdStep)
                 .from(guLawdCdStep).on("*").end()
                 .end()
                 .build();
@@ -106,29 +106,29 @@ public class AptDealInsertJobConfig {
         return new GuLawdTasklet(lawdRepository);
     }
 
-    @JobScope
-    @Bean
-    @Qualifier("contextPrintStep")
-    public Step contextPrintStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,@Qualifier("contextPrintTasklet") Tasklet tasklet) {
-        return new StepBuilder("contextPrintStep", jobRepository)
-                .tasklet(tasklet, transactionManager)
-                .build();
-    }
-
-    @StepScope
-    @Bean
-    @Qualifier("contextPrintTasklet")
-    public Tasklet contextPrintTasklet(
-            @Value("#{jobExecutionContext['guLawdCd']}") String guLawdCd) {
-        return (contribution, chunkContext) -> {
-            System.out.println("[contextPrintTasklet] guLawdCd : " + guLawdCd);
-            String str = chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().getString("guLawdCd");
-
-            System.out.println("[contextPrintTasklet] guLawdCd : " + guLawdCd);
-            System.out.println("[contextPrintTasklet] str : " + str);
-            return RepeatStatus.FINISHED;
-        };
-    }
+//    @JobScope
+//    @Bean
+//    @Qualifier("contextPrintStep")
+//    public Step contextPrintStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,@Qualifier("contextPrintTasklet") Tasklet tasklet) {
+//        return new StepBuilder("contextPrintStep", jobRepository)
+//                .tasklet(tasklet, transactionManager)
+//                .build();
+//    }
+//
+//    @StepScope
+//    @Bean
+//    @Qualifier("contextPrintTasklet")
+//    public Tasklet contextPrintTasklet(
+//            @Value("#{jobExecutionContext['guLawdCd']}") String guLawdCd) {
+//        return (contribution, chunkContext) -> {
+//            System.out.println("[contextPrintTasklet] guLawdCd : " + guLawdCd);
+//            String str = chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().getString("guLawdCd");
+//
+//            System.out.println("[contextPrintTasklet] guLawdCd : " + guLawdCd);
+//            System.out.println("[contextPrintTasklet] str : " + str);
+//            return RepeatStatus.FINISHED;
+//        };
+//    }
 
     @Bean
     @StepScope
