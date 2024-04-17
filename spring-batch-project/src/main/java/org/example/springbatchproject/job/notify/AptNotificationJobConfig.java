@@ -3,6 +3,7 @@ package org.example.springbatchproject.job.notify;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.springbatchproject.adapter.FakeSendService;
 import org.example.springbatchproject.core.dto.AptDto;
 import org.example.springbatchproject.core.dto.NotificationDto;
 import org.example.springbatchproject.core.entity.AptNotification;
@@ -110,9 +111,9 @@ public class AptNotificationJobConfig {
 
     @StepScope
     @Bean
-    public ItemWriter<NotificationDto> aptNotificationItemWriter() {
+    public ItemWriter<NotificationDto> aptNotificationItemWriter(FakeSendService fakeSendService) {
         return chunk -> {
-            chunk.forEach(item -> System.out.println(item.toMessage()));
+            chunk.forEach(item -> fakeSendService.send(item.getEmail(), item.toMessage()));
         };
     }
 

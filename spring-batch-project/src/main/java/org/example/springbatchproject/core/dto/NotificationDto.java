@@ -1,6 +1,7 @@
 package org.example.springbatchproject.core.dto;
 
 import lombok.Builder;
+import lombok.Getter;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.text.DecimalFormat;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Builder
+@Getter
 public class NotificationDto {
 
     private String email;
@@ -21,6 +23,5 @@ public class NotificationDto {
                 + aptDeals.stream().map(deal -> String.format("- %s : %s원\n", deal.getName(), df.format(deal.getPrice())))
                     .collect(Collectors.joining());
     }
-
 
 }
