@@ -35,4 +35,11 @@ spring:
       on-profile: test
   jpa:
     database: h2
+    generate-ddl: true
+    show-sql: true
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      name: ${job.name:NONE}
 

@@ -12,36 +12,39 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
-@RequiredArgsConstructor
-public class HelloJobConfig {
-
-    @Bean
-    public Job helloJob(JobRepository jobRepository, Step helloStep) {
-        return new JobBuilder("helloJob", jobRepository)
-                .incrementer(new RunIdIncrementer())
-                .start(helloStep)
-                .build();
-    }
-
-    @JobScope
-    @Bean
-    public Step helloStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, Tasklet tasklet) {
-        return new StepBuilder("helloStep", jobRepository)
-                .tasklet(tasklet, transactionManager)
-                .build();
-    }
-
-    @StepScope
-    @Bean
-    public Tasklet myTasklet() {
-        return (contribution, chunkContext) -> {
-            System.out.println("Hello Spring Batch");
-            return RepeatStatus.FINISHED;
-        };
-    }
-}
+//@Configuration
+//@RequiredArgsConstructor
+//public class HelloJobConfig {
+//
+//    @Bean
+//    public Job helloJob(JobRepository jobRepository,@Qualifier("hello_step") Step helloStep) {
+//        return new JobBuilder("helloJob", jobRepository)
+//                .incrementer(new RunIdIncrementer())
+//                .start(helloStep)
+//                .build();
+//    }
+//
+//    @JobScope
+//    @Bean
+//    @Qualifier("hello_step")
+//    public Step helloStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,@Qualifier("hello_tasklet") Tasklet tasklet) {
+//        return new StepBuilder("helloStep", jobRepository)
+//                .tasklet(tasklet, transactionManager)
+//                .build();
+//    }
+//
+//    @StepScope
+//    @Bean
+//    @Qualifier("hello_tasklet")
+//    public Tasklet myTasklet() {
+//        return (contribution, chunkContext) -> {
+//            System.out.println("Hello Spring Batch");
+//            return RepeatStatus.FINISHED;
+//        };
+//    }
+//}
