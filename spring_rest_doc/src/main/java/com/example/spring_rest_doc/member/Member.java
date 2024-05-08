@@ -2,6 +2,7 @@ package com.example.spring_rest_doc.member;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Member {
 
     @Id
@@ -33,5 +35,9 @@ public class Member {
         this.name = name;
         this.createdAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
+    }
+
+    public void modify(final String name) {
+        this.name = name;
     }
 }
